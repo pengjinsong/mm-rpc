@@ -13,12 +13,10 @@ import java.util.Map;
  * @description:
  * @ModifiedBy:
  */
-@MmRpcService(url ="http://localhost:8088/xxl-job-admin" )
+@MmRpcService(url ="http://localhost:8088/xx" )
 public interface TestInterface {
-    @RequestLine("GET /pageList?start={start}&length={length}&executorHandler={jobGroup}&filterTime={filterTime}")
+    @RequestLine("GET /pageList?start={start}&length={length}")
     public Map<String, Object> pageList(@Param("start") int start,
-                                        @Param("length")int length,
-                                        @Param("jobGroup") int jobGroup,
-                                        @Param("executorHandler") String executorHandler,
-                                        @Param("filterTime") String filterTime);
+                                        @Param("length")int length
+                                       );
 }

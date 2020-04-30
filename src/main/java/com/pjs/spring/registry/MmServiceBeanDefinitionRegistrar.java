@@ -4,6 +4,8 @@ package com.pjs.spring.registry;
 import com.pjs.annotation.EnableMmRpc;
 import com.pjs.annotation.MmRpcService;
 import com.pjs.spring.MmFeignFactoryBean;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.AnnotatedBeanDefinition;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.config.BeanDefinitionHolder;
@@ -34,8 +36,8 @@ import java.util.Set;
  * @ModifiedBy:
  */
 
-public class ServiceBeanDefinitionRegistrar implements ImportBeanDefinitionRegistrar, ResourceLoaderAware, EnvironmentAware {
-
+public class MmServiceBeanDefinitionRegistrar implements ImportBeanDefinitionRegistrar, ResourceLoaderAware, EnvironmentAware {
+    private static final Logger logger= LoggerFactory.getLogger(MmServiceBeanDefinitionRegistrar.class);
     private ResourceLoader resourceLoader;
 
     private Environment environment;
@@ -88,7 +90,9 @@ public class ServiceBeanDefinitionRegistrar implements ImportBeanDefinitionRegis
                     Assert.isTrue(annotationMetadata.isInterface(),
                             "@QmpRpcService can only be specified on an interface");
                     Map<String, Object> annotationAttributes = annotationMetadata.getAnnotationAttributes(MmRpcService.class.getCanonicalName());
-
+                    if (logger.isDebugEnabled()){
+                        logger.debug("scanner mmRpc interface {}",beanDefinition.getBeanClassName());
+                    }
                     registryQmpService(registry, annotationMetadata, annotationAttributes);
                 }
             }
@@ -115,7 +119,8 @@ public class ServiceBeanDefinitionRegistrar implements ImportBeanDefinitionRegis
 
         AbstractBeanDefinition beanDefinition = builder.getBeanDefinition();
 
-        String name = annotationMetadata.getInterfaceNames()[0];
+        String name = annotationMetadata.getClassName();
+        name=name.substring(name.lastIndexOf("."));
         String alias = name + "RpcService";
 
         String qualifier = getQualifier(annotationAttributes);
@@ -123,9 +128,13 @@ public class ServiceBeanDefinitionRegistrar implements ImportBeanDefinitionRegis
             alias = qualifier;
         }
 
-        boolean primary = (boolean) annotationAttributes.get("primary");
+        //have a default not null
+        Boolean primary = (Boolean)annotationAttributes.get("primary");
         beanDefinition.setPrimary(primary);
 
+        if (logger.isDebugEnabled()){
+            logger.debug("===> registry rpc interface {} proxy by feign",annotationMetadata.getClassName());
+        }
         BeanDefinitionHolder definitionHolder = new BeanDefinitionHolder(beanDefinition, className, new String[]{alias});
 
         BeanDefinitionReaderUtils.registerBeanDefinition(definitionHolder, registry);

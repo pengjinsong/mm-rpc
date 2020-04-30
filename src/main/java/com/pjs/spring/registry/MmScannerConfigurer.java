@@ -42,7 +42,7 @@ public class MmScannerConfigurer implements BeanDefinitionRegistryPostProcessor,
         //处理配置内容
         processPropertyPlaceHolders();
         //实例化scanner
-        ClassPathMmScanner scanner = new ClassPathMmScanner(registry);
+        MmClassPathMmScanner scanner = new MmClassPathMmScanner(registry);
         if (annotationClass==null){
             annotationClass=MmRpcService.class;
         }

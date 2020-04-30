@@ -22,13 +22,13 @@ import java.util.Set;
  * @description: 自定义扫描类
  * @ModifiedBy:
  */
-public class ClassPathMmScanner extends ClassPathBeanDefinitionScanner {
+public class MmClassPathMmScanner extends ClassPathBeanDefinitionScanner {
 
     private Class<? extends Annotation> annotationClass;
 
     private FactoryBean<?> factoryBean;
 
-    public ClassPathMmScanner(BeanDefinitionRegistry registry) {
+    public MmClassPathMmScanner(BeanDefinitionRegistry registry) {
         super(registry, false);
     }
 

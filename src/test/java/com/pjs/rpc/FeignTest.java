@@ -6,6 +6,8 @@ import feign.Response;
 import feign.codec.ErrorDecoder;
 import feign.gson.GsonDecoder;
 import feign.gson.GsonEncoder;
+import feign.httpclient.ApacheHttpClient;
+import org.apache.http.impl.client.HttpClients;
 
 import java.util.Map;
 
@@ -19,14 +21,14 @@ public class FeignTest {
     public static void main(String[] args) {
         GsonEncoder encoder = new GsonEncoder();
         GsonDecoder decoder = new GsonDecoder();
-        /*JobInfoFeign target = Feign.builder()
+         Feign.builder()
+                 .client(new ApacheHttpClient())
                 .encoder(encoder)
                 .decoder(decoder)
                 .logger(new Logger.ErrorLogger())
-                .logLevel(Logger.Level.BASIC)
-                .target(JobInfoFeign.class, "http://localhost:8088/xxl-job-admin");
-        Map<String, Object> map = target.pageList(0, 10, 0, null, null);
-        System.out.println(map);*/
+                .logLevel(Logger.Level.BASIC);
+
+
         Class<? extends GsonEncoder> aClass = encoder.getClass();
         System.out.println(aClass.getCanonicalName());
         System.out.println(aClass.getSimpleName());

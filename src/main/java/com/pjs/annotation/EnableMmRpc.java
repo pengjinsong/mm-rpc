@@ -1,7 +1,7 @@
 package com.pjs.annotation;
 
 
-import com.pjs.spring.registry.ServiceBeanDefinitionRegistrar;
+import com.pjs.spring.registry.MmServiceBeanDefinitionRegistrar;
 import org.springframework.context.annotation.Import;
 
 import java.lang.annotation.*;
@@ -15,7 +15,7 @@ import java.lang.annotation.*;
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.TYPE)
 @Documented
-@Import(ServiceBeanDefinitionRegistrar.class)
+@Import(MmServiceBeanDefinitionRegistrar.class)
 public @interface EnableMmRpc {
     /**
      * 包的别名

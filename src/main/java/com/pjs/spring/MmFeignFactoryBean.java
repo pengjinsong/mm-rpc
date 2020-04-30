@@ -1,11 +1,19 @@
 package com.pjs.spring;
 
+import com.pjs.feign.GsonFactory;
+import feign.Client;
 import feign.Feign;
 import feign.Logger;
 import feign.RequestInterceptor;
 import feign.codec.Decoder;
 import feign.codec.Encoder;
 import feign.codec.ErrorDecoder;
+import feign.gson.GsonDecoder;
+import feign.gson.GsonEncoder;
+import feign.httpclient.ApacheHttpClient;
+import feign.slf4j.Slf4jLogger;
+import okhttp3.OkHttpClient;
+import org.apache.http.client.HttpClient;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.FactoryBean;
 import org.springframework.beans.factory.InitializingBean;
@@ -28,6 +36,8 @@ public class MmFeignFactoryBean implements FactoryBean<Object>, InitializingBean
      * spring context
      */
     private ApplicationContext applicationContext;
+
+    private Client client;
     /**
      * 代理接口
      */
@@ -59,22 +69,26 @@ public class MmFeignFactoryBean implements FactoryBean<Object>, InitializingBean
     /**
      * feign拦截器
      */
-    private List<RequestInterceptor> interceptors=new LinkedList<>();
+    private List<RequestInterceptor> interceptors = new LinkedList<>();
 
     @Override
     public Object getObject() throws Exception {
-       return createFeignTarget();
+        return createFeignTarget();
     }
 
     private Object createFeignTarget() {
         Feign.Builder builder = new Feign.Builder();
-        return builder.decoder(decoder)
+        builder = builder
+                .decoder(decoder)
                 .encoder(encoder)
                 .logger(logger)
                 .logLevel(logLevel)
                 .requestInterceptors(interceptors)
-                .errorDecoder(errorDecoder)
-                .target(type, url);
+                .errorDecoder(errorDecoder);
+        if (client != null) {
+            builder.client(client);
+        }
+        return builder.target(type, url);
     }
 
     @Override
@@ -89,18 +103,32 @@ public class MmFeignFactoryBean implements FactoryBean<Object>, InitializingBean
 
     @Override
     public void afterPropertiesSet() throws Exception {
-        Assert.hasText(url,"远程调用接口必须设置url地址");
-        Assert.notNull(type,"type must not be null");
-        decoder=applicationContext.getBean(Decoder.class);
-        encoder=applicationContext.getBean(Encoder.class);
-        errorDecoder=applicationContext.getBean(ErrorDecoder.class);
-        Assert.notNull(decoder,"decoder must not be null");
-        Assert.notNull(decoder,"encoder must not be null");
-        if (null==logger){
-            logger=new Logger.ErrorLogger();
+        Assert.hasText(url, "远程调用接口必须设置url地址");
+        Assert.notNull(type, "type must not be null");
+        decoder = applicationContext.getBean(Decoder.class);
+        encoder = applicationContext.getBean(Encoder.class);
+        errorDecoder = applicationContext.getBean(ErrorDecoder.class);
+        HttpClient httpClient = applicationContext.getBean(HttpClient.class);
+        OkHttpClient okHttpClient = applicationContext.getBean(OkHttpClient.class);
+        if (null != okHttpClient) {
+            client = new feign.okhttp.OkHttpClient(okHttpClient);
+        } else if (null != httpClient) {
+            client = new ApacheHttpClient(httpClient);
         }
-        if (null==logLevel){
-            logLevel= Logger.Level.BASIC;
+        if (null == decoder) {
+            decoder = GsonFactory.decoder();
+        }
+        if (null == errorDecoder) {
+            errorDecoder = new ErrorDecoder.Default();
+        }
+        if (null == encoder) {
+            encoder = GsonFactory.encoder();
+        }
+        if (null == logger) {
+            logger = new Slf4jLogger();
+        }
+        if (null == logLevel) {
+            logLevel = Logger.Level.BASIC;
         }
         //添加拦截器
         Map<String, RequestInterceptor> beans = applicationContext.getBeansOfType(RequestInterceptor.class);
@@ -165,8 +193,16 @@ public class MmFeignFactoryBean implements FactoryBean<Object>, InitializingBean
         return errorDecoder;
     }
 
-    public void addInterceptor(RequestInterceptor interceptor){
+    public void addInterceptor(RequestInterceptor interceptor) {
         this.interceptors.add(interceptor);
+    }
+
+    public Client getClient() {
+        return client;
+    }
+
+    public void setClient(Client client) {
+        this.client = client;
     }
 
     @Override
@@ -212,6 +248,6 @@ public class MmFeignFactoryBean implements FactoryBean<Object>, InitializingBean
 
     @Override
     public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
-        this.applicationContext=applicationContext;
+        this.applicationContext = applicationContext;
     }
 }

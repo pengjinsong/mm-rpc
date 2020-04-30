@@ -18,4 +18,6 @@ public @interface MmRpcService {
      * @return
      */
     String url();
+
+    boolean primary() default true;
 }

@@ -11,6 +11,7 @@
     <properties>
         <spring.version>5.2.5.RELEASE</spring.version>
         <feign.version>11.0</feign.version>
+        <httpclient.version>4.5.12</httpclient.version>
     </properties>
 
     <dependencies>
@@ -30,7 +31,16 @@
             <artifactId>feign-slf4j</artifactId>
             <version>${feign.version}</version>
         </dependency>
-
+        <dependency>
+            <groupId>io.github.openfeign</groupId>
+            <artifactId>feign-httpclient</artifactId>
+            <version>${feign.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>io.github.openfeign</groupId>
+            <artifactId>feign-okhttp</artifactId>
+            <version>${feign.version}</version>
+        </dependency>
         <!--spring dependencies-->
         <dependency>
             <groupId>org.springframework</groupId>
@@ -47,6 +57,7 @@
             <artifactId>spring-beans</artifactId>
             <version>${spring.version}</version>
         </dependency>
+
 
     </dependencies>
 
