@@ -1,5 +1,7 @@
 package com.pjs.spring;
 
+import com.pjs.feign.DefaultLogFactory;
+import com.pjs.feign.FeignLogFactory;
 import com.pjs.feign.GsonFactory;
 import feign.Client;
 import feign.Feign;
@@ -70,6 +72,10 @@ public class MmFeignFactoryBean implements FactoryBean<Object>, InitializingBean
      * feign拦截器
      */
     private List<RequestInterceptor> interceptors = new LinkedList<>();
+    /**
+     * 日志工厂
+     */
+    private FeignLogFactory feignLogFactory;
 
     @Override
     public Object getObject() throws Exception {
@@ -83,10 +89,12 @@ public class MmFeignFactoryBean implements FactoryBean<Object>, InitializingBean
                 .encoder(encoder)
                 .logger(logger)
                 .logLevel(logLevel)
-                .requestInterceptors(interceptors)
-                .errorDecoder(errorDecoder);
+                .requestInterceptors(interceptors);
         if (client != null) {
             builder.client(client);
+        }
+        if (errorDecoder!=null){
+            builder.errorDecoder(errorDecoder);
         }
         return builder.target(type, url);
     }
@@ -115,18 +123,8 @@ public class MmFeignFactoryBean implements FactoryBean<Object>, InitializingBean
         } else if (null != httpClient) {
             client = new ApacheHttpClient(httpClient);
         }
-        if (null == decoder) {
-            decoder = GsonFactory.decoder();
-        }
-        if (null == errorDecoder) {
-            errorDecoder = new ErrorDecoder.Default();
-        }
-        if (null == encoder) {
-            encoder = GsonFactory.encoder();
-        }
-        if (null == logger) {
-            logger = new Slf4jLogger();
-        }
+        feignLogFactory=new DefaultLogFactory(logger);
+        logger=feignLogFactory.create(type);
         if (null == logLevel) {
             logLevel = Logger.Level.BASIC;
         }
@@ -203,6 +201,14 @@ public class MmFeignFactoryBean implements FactoryBean<Object>, InitializingBean
 
     public void setClient(Client client) {
         this.client = client;
+    }
+
+    public FeignLogFactory getFeignLogFactory() {
+        return feignLogFactory;
+    }
+
+    public void setFeignLogFactory(FeignLogFactory feignLogFactory) {
+        this.feignLogFactory = feignLogFactory;
     }
 
     @Override
