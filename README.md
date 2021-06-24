@@ -69,8 +69,6 @@ import org.springframework.context.annotation.Import;
   }
 ```
 ```java
-
-
 import io.github.rpc.annotation.MmRpcService;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;

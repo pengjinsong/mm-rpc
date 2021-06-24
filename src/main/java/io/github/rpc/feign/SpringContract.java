@@ -42,8 +42,11 @@ public class SpringContract extends DeclarativeContract {
             String[] mappings = requestMapping.value();
             appendMappings(data, mappings);
 
-            if (requestMapping.method().length == 1)
+            if (requestMapping.method().length == 1) {
                 data.template().method(Request.HttpMethod.valueOf(requestMapping.method()[0].name()));
+            }else {
+                throw new IllegalArgumentException("RequestMapper must has method,please set");
+            }
         });
 
 
