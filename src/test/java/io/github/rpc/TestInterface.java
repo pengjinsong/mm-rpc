@@ -1,7 +1,7 @@
-package com.pjs.rpc;
+package io.github.rpc;
 
 
-import com.pjs.annotation.MmRpcService;
+import io.github.rpc.annotation.MmRpcService;
 import feign.Param;
 import feign.RequestLine;
 

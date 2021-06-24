@@ -1,4 +1,4 @@
-package com.pjs.feign;
+package io.github.rpc.feign;
 
 import feign.Feign;
 import feign.Logger;

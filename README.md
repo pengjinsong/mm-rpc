@@ -54,3 +54,30 @@
   ```
 
 - 
+### 1.1.0 
+- 提供默认配置
+- 引入spring4 注解支持
+
+```java
+import io.github.rpc.configuration.ClientDefaultConfiguration;
+import org.springframework.context.annotation.Import;
+@Configuration
+@Import(ClientDefaultConfiguration.class)
+@EnableMmRpc(basePackages = "com.pjs.rpc")
+  public class FeiConfiguration {
+     
+  }
+```
+```java
+
+
+import io.github.rpc.annotation.MmRpcService;import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
+@MmRpcService("http://")
+public interface TestFeign{
+    @GetMapping("/test")
+    @ResponseBody
+    AjaxJson test(@RequestParam("name") String name);
+}
+```

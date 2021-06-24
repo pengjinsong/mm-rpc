@@ -1,7 +1,7 @@
-package com.pjs.annotation;
+package io.github.rpc.annotation;
 
 
-import com.pjs.spring.registry.MmServiceBeanDefinitionRegistrar;
+import io.github.rpc.spring.registry.MmServiceBeanDefinitionRegistrar;
 import org.springframework.context.annotation.Import;
 
 import java.lang.annotation.*;

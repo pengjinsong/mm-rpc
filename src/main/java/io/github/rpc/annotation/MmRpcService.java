@@ -1,4 +1,4 @@
-package com.pjs.annotation;
+package io.github.rpc.annotation;
 
 import java.lang.annotation.*;
 
@@ -18,6 +18,12 @@ public @interface MmRpcService {
      * @return
      */
     String url();
+
+    /**
+     * 上下文路径
+     * @return
+     */
+    String path() default "";
 
     boolean primary() default true;
 }

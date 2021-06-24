@@ -1,9 +1,9 @@
-package com.pjs.spring.registry;
+package io.github.rpc.spring.registry;
 
 
-import com.pjs.annotation.MmRpcService;
-import com.pjs.feign.MmFeign;
-import com.pjs.feign.MmFeignFactory;
+import io.github.rpc.annotation.MmRpcService;
+import io.github.rpc.feign.MmFeign;
+import io.github.rpc.feign.MmFeignFactory;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.BeanFactoryAware;

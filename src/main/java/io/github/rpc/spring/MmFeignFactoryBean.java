@@ -1,19 +1,12 @@
-package com.pjs.spring;
+package io.github.rpc.spring;
 
-import com.pjs.feign.DefaultLogFactory;
-import com.pjs.feign.FeignLogFactory;
-import com.pjs.feign.GsonFactory;
-import feign.Client;
-import feign.Feign;
-import feign.Logger;
-import feign.RequestInterceptor;
+import io.github.rpc.feign.DefaultLogFactory;
+import io.github.rpc.feign.FeignLogFactory;
+import feign.*;
 import feign.codec.Decoder;
 import feign.codec.Encoder;
 import feign.codec.ErrorDecoder;
-import feign.gson.GsonDecoder;
-import feign.gson.GsonEncoder;
 import feign.httpclient.ApacheHttpClient;
-import feign.slf4j.Slf4jLogger;
 import okhttp3.OkHttpClient;
 import org.apache.http.client.HttpClient;
 import org.springframework.beans.BeansException;
@@ -26,6 +19,7 @@ import org.springframework.util.Assert;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 /**
  * @Author:pjs
@@ -33,7 +27,7 @@ import java.util.Map;
  * @description:
  * @ModifiedBy:
  */
-public class MmFeignFactoryBean implements FactoryBean<Object>, InitializingBean, ApplicationContextAware {
+public class MmFeignFactoryBean implements FactoryBean<Object>, InitializingBean, ApplicationContextAware{
     /**
      * spring context
      */
@@ -69,6 +63,10 @@ public class MmFeignFactoryBean implements FactoryBean<Object>, InitializingBean
      */
     private ErrorDecoder errorDecoder;
     /**
+     * 处理对象
+     */
+    private Contract contract;
+    /**
      * feign拦截器
      */
     private List<RequestInterceptor> interceptors = new LinkedList<>();
@@ -93,8 +91,11 @@ public class MmFeignFactoryBean implements FactoryBean<Object>, InitializingBean
         if (client != null) {
             builder.client(client);
         }
-        if (errorDecoder!=null){
+        if (errorDecoder != null) {
             builder.errorDecoder(errorDecoder);
+        }
+        if (contract != null) {
+            builder.contract(contract);
         }
         return builder.target(type, url);
     }
@@ -116,15 +117,29 @@ public class MmFeignFactoryBean implements FactoryBean<Object>, InitializingBean
         decoder = applicationContext.getBean(Decoder.class);
         encoder = applicationContext.getBean(Encoder.class);
         errorDecoder = applicationContext.getBean(ErrorDecoder.class);
-        HttpClient httpClient = applicationContext.getBean(HttpClient.class);
-        OkHttpClient okHttpClient = applicationContext.getBean(OkHttpClient.class);
-        if (null != okHttpClient) {
+        HttpClient httpClient = null;
+        OkHttpClient okHttpClient=null;
+        try {
+            httpClient=applicationContext.getBean(HttpClient.class);
+        }catch (BeansException e){
+            try {
+                okHttpClient = applicationContext.getBean(OkHttpClient.class);
+            }catch (BeansException e1){
+                //ignore
+            }
+        }
+        if (Objects.isNull(httpClient)&&Objects.isNull(okHttpClient)){
+            throw new IllegalStateException("can not found any client");
+        }
+        else if (null != okHttpClient) {
             client = new feign.okhttp.OkHttpClient(okHttpClient);
         } else if (null != httpClient) {
             client = new ApacheHttpClient(httpClient);
         }
-        feignLogFactory=new DefaultLogFactory(logger);
-        logger=feignLogFactory.create(type);
+
+        this.contract = applicationContext.getBean(Contract.class);
+        feignLogFactory = new DefaultLogFactory(logger);
+        logger = feignLogFactory.create(type);
         if (null == logLevel) {
             logLevel = Logger.Level.BASIC;
         }

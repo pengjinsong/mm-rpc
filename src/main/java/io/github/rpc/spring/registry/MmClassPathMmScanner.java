@@ -1,7 +1,7 @@
-package com.pjs.spring.registry;
+package io.github.rpc.spring.registry;
 
 
-import com.pjs.spring.MmFeignFactoryBean;
+import io.github.rpc.spring.MmFeignFactoryBean;
 import org.springframework.beans.factory.FactoryBean;
 import org.springframework.beans.factory.annotation.AnnotatedBeanDefinition;
 import org.springframework.beans.factory.config.BeanDefinitionHolder;

@@ -1,6 +1,6 @@
-package com.pjs.spring.registry;
+package io.github.rpc.spring.registry;
 
-import com.pjs.annotation.MmRpcService;
+import io.github.rpc.annotation.MmRpcService;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.MutablePropertyValues;
 import org.springframework.beans.PropertyValue;

@@ -1,4 +1,4 @@
-package com.pjs.feign;
+package io.github.rpc.feign;
 
 import feign.Logger;
 import feign.slf4j.Slf4jLogger;

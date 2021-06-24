@@ -1,9 +1,9 @@
-package com.pjs.spring.registry;
+package io.github.rpc.spring.registry;
 
 
-import com.pjs.annotation.EnableMmRpc;
-import com.pjs.annotation.MmRpcService;
-import com.pjs.spring.MmFeignFactoryBean;
+import io.github.rpc.annotation.EnableMmRpc;
+import io.github.rpc.annotation.MmRpcService;
+import io.github.rpc.spring.MmFeignFactoryBean;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.AnnotatedBeanDefinition;
@@ -37,7 +37,7 @@ import java.util.Set;
  */
 
 public class MmServiceBeanDefinitionRegistrar implements ImportBeanDefinitionRegistrar, ResourceLoaderAware, EnvironmentAware {
-    private static final Logger logger= LoggerFactory.getLogger(MmServiceBeanDefinitionRegistrar.class);
+    private static final Logger logger = LoggerFactory.getLogger(MmServiceBeanDefinitionRegistrar.class);
     private ResourceLoader resourceLoader;
 
     private Environment environment;
@@ -90,8 +90,8 @@ public class MmServiceBeanDefinitionRegistrar implements ImportBeanDefinitionReg
                     Assert.isTrue(annotationMetadata.isInterface(),
                             "@QmpRpcService can only be specified on an interface");
                     Map<String, Object> annotationAttributes = annotationMetadata.getAnnotationAttributes(MmRpcService.class.getCanonicalName());
-                    if (logger.isDebugEnabled()){
-                        logger.debug("scanner mmRpc interface {}",beanDefinition.getBeanClassName());
+                    if (logger.isDebugEnabled()) {
+                        logger.debug("scanner mmRpc interface {}", beanDefinition.getBeanClassName());
                     }
                     registryQmpService(registry, annotationMetadata, annotationAttributes);
                 }
@@ -101,6 +101,7 @@ public class MmServiceBeanDefinitionRegistrar implements ImportBeanDefinitionReg
 
     /**
      * 创建代理feign Bean
+     *
      * @param registry
      * @param annotationMetadata
      * @param annotationAttributes
@@ -111,7 +112,20 @@ public class MmServiceBeanDefinitionRegistrar implements ImportBeanDefinitionReg
 
         BeanDefinitionBuilder builder = BeanDefinitionBuilder.genericBeanDefinition(MmFeignFactoryBean.class);
         String url = (String) annotationAttributes.get("url");
-
+        url=resolve(url);
+        if (!url.startsWith("http://")) {
+            url = "http://" + url;
+        }
+        String path = (String) annotationAttributes.get("path");
+        path=resolve(path);
+        if (url.endsWith("/")) {
+            String s = url.trim();
+            url = s.substring(0, s.length() + 1);
+        }
+        if (StringUtils.hasText(path) && !path.startsWith("/")) {
+            path = "/" + path.trim();
+        }
+        url+=path;
         builder.addPropertyValue("url", url);
         builder.addPropertyValue("type", className);
 
@@ -120,7 +134,7 @@ public class MmServiceBeanDefinitionRegistrar implements ImportBeanDefinitionReg
         AbstractBeanDefinition beanDefinition = builder.getBeanDefinition();
 
         String name = annotationMetadata.getClassName();
-        name=name.substring(name.lastIndexOf("."));
+        name = name.substring(name.lastIndexOf(".")-1);
         String alias = name + "RpcService";
 
         String qualifier = getQualifier(annotationAttributes);
@@ -129,15 +143,27 @@ public class MmServiceBeanDefinitionRegistrar implements ImportBeanDefinitionReg
         }
 
         //have a default not null
-        Boolean primary = (Boolean)annotationAttributes.get("primary");
+        Boolean primary = (Boolean) annotationAttributes.get("primary");
         beanDefinition.setPrimary(primary);
 
-        if (logger.isDebugEnabled()){
-            logger.debug("===> registry rpc interface {} proxy by feign",annotationMetadata.getClassName());
+        if (logger.isDebugEnabled()) {
+            logger.debug("===> registry rpc interface {} proxy by feign", annotationMetadata.getClassName());
         }
         BeanDefinitionHolder definitionHolder = new BeanDefinitionHolder(beanDefinition, className, new String[]{alias});
 
         BeanDefinitionReaderUtils.registerBeanDefinition(definitionHolder, registry);
+    }
+
+    /**
+     * 解析占位符
+     * @param value
+     * @return
+     */
+    private String resolve(String value){
+        if (StringUtils.hasText(value)){
+            return this.environment.resolvePlaceholders(value);
+        }
+        return value;
     }
 
     /**

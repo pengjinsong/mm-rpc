@@ -4,14 +4,16 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>com.pjs</groupId>
+    <groupId>io.github</groupId>
     <artifactId>mm-rpc</artifactId>
-    <version>1.0-SNAPSHOT</version>
+    <packaging>jar</packaging>
+    <version>1.1.0</version>
 
     <properties>
-        <spring.version>5.2.5.RELEASE</spring.version>
+        <spring.version>4.0.8.RELEASE</spring.version>
         <feign.version>11.0</feign.version>
         <httpclient.version>4.5.12</httpclient.version>
+        <apache.httpclient.version>4.5.13</apache.httpclient.version>
     </properties>
 
     <dependencies>
@@ -21,9 +23,14 @@
             <artifactId>feign-core</artifactId>
             <version>${feign.version}</version>
         </dependency>
-        <dependency>
+       <!-- <dependency>
             <groupId>io.github.openfeign</groupId>
             <artifactId>feign-gson</artifactId>
+            <version>${feign.version}</version>
+        </dependency>-->
+        <dependency>
+            <groupId>io.github.openfeign</groupId>
+            <artifactId>feign-jackson</artifactId>
             <version>${feign.version}</version>
         </dependency>
         <dependency>
@@ -41,24 +48,42 @@
             <artifactId>feign-okhttp</artifactId>
             <version>${feign.version}</version>
         </dependency>
+       <!-- <dependency>
+            <groupId>io.github.openfeign</groupId>
+            <artifactId>feign-spring4</artifactId>
+            <version>${feign.version}</version>
+        </dependency>-->
         <!--spring dependencies-->
         <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-context</artifactId>
             <version>${spring.version}</version>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-core</artifactId>
             <version>${spring.version}</version>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-beans</artifactId>
             <version>${spring.version}</version>
+            <scope>provided</scope>
         </dependency>
-
-
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-web</artifactId>
+            <version>${spring.version}</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.httpcomponents</groupId>
+            <artifactId>httpclient</artifactId>
+            <version>${apache.httpclient.version}</version>
+            <scope>provided</scope>
+        </dependency>
     </dependencies>
 
     <build>
@@ -73,7 +98,19 @@
                     <encoding>UTF-8</encoding>
                 </configuration>
             </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-source-plugin</artifactId>
+                <version>3.2.1</version>
+                <executions>
+                    <execution>
+                        <id>attach-sources</id>
+                        <goals>
+                            <goal>jar</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
         </plugins>
     </build>
-
 </project>
