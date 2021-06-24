@@ -71,12 +71,15 @@ import org.springframework.context.annotation.Import;
 ```java
 
 
-import io.github.rpc.annotation.MmRpcService;import org.springframework.web.bind.annotation.GetMapping;
+import io.github.rpc.annotation.MmRpcService;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
-@MmRpcService("http://")
+@MmRpcService("http://localhost:9527")
 public interface TestFeign{
-    @GetMapping("/test")
+    @RequestMapping(value = "/test",method = RequestMethod.GET)
     @ResponseBody
     AjaxJson test(@RequestParam("name") String name);
 }
