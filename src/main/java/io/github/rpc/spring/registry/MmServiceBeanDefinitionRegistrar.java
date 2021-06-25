@@ -112,20 +112,8 @@ public class MmServiceBeanDefinitionRegistrar implements ImportBeanDefinitionReg
 
         BeanDefinitionBuilder builder = BeanDefinitionBuilder.genericBeanDefinition(MmFeignFactoryBean.class);
         String url = (String) annotationAttributes.get("url");
-        url=resolve(url);
-        if (!url.startsWith("http://")) {
-            url = "http://" + url;
-        }
         String path = (String) annotationAttributes.get("path");
-        path=resolve(path);
-        if (url.endsWith("/")) {
-            String s = url.trim();
-            url = s.substring(0, s.length() + 1);
-        }
-        if (StringUtils.hasText(path) && !path.startsWith("/")) {
-            path = "/" + path.trim();
-        }
-        url+=path;
+        url = realUrl(url, path);
         builder.addPropertyValue("url", url);
         builder.addPropertyValue("type", className);
 
@@ -134,7 +122,7 @@ public class MmServiceBeanDefinitionRegistrar implements ImportBeanDefinitionReg
         AbstractBeanDefinition beanDefinition = builder.getBeanDefinition();
 
         String name = annotationMetadata.getClassName();
-        name = name.substring(name.lastIndexOf(".")-1);
+        name = name.substring(name.lastIndexOf(".") - 1);
         String alias = name + "RpcService";
 
         String qualifier = getQualifier(annotationAttributes);
@@ -154,13 +142,31 @@ public class MmServiceBeanDefinitionRegistrar implements ImportBeanDefinitionReg
         BeanDefinitionReaderUtils.registerBeanDefinition(definitionHolder, registry);
     }
 
+    private String realUrl(String url, String path) {
+        url = resolve(url);
+        if (!url.startsWith("http://")) {
+            url = "http://" + url;
+        }
+        path = resolve(path);
+        if (url.endsWith("/")) {
+            String s = url.trim();
+            url = s.substring(0, s.length() + 1);
+        }
+        if (StringUtils.hasText(path) && !path.startsWith("/")) {
+            path = "/" + path.trim();
+        }
+        url += path;
+        return url;
+    }
+
     /**
      * 解析占位符
+     *
      * @param value
      * @return
      */
-    private String resolve(String value){
-        if (StringUtils.hasText(value)){
+    private String resolve(String value) {
+        if (StringUtils.hasText(value)) {
             return this.environment.resolvePlaceholders(value);
         }
         return value;

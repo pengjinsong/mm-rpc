@@ -14,13 +14,13 @@ package io.github.rpc.feign; /**
  *  删除部分库不支持的类
  */
 
-import java.util.ArrayList;
-import java.util.Collection;
 import feign.DeclarativeContract;
 import feign.MethodMetadata;
 import feign.Request;
-import io.github.rpc.annotation.MmRpcService;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.ArrayList;
+import java.util.Collection;
 
 public class SpringContract extends DeclarativeContract {
 
