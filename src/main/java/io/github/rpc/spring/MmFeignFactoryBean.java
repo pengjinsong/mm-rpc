@@ -1,12 +1,12 @@
 package io.github.rpc.spring;
 
-import io.github.rpc.feign.DefaultLogFactory;
-import io.github.rpc.feign.FeignLogFactory;
 import feign.*;
 import feign.codec.Decoder;
 import feign.codec.Encoder;
 import feign.codec.ErrorDecoder;
 import feign.httpclient.ApacheHttpClient;
+import io.github.rpc.feign.DefaultLogFactory;
+import io.github.rpc.feign.FeignLogFactory;
 import okhttp3.OkHttpClient;
 import org.apache.http.client.HttpClient;
 import org.springframework.beans.BeansException;
@@ -27,7 +27,7 @@ import java.util.Objects;
  * @description:
  * @ModifiedBy:
  */
-public class MmFeignFactoryBean implements FactoryBean<Object>, InitializingBean, ApplicationContextAware{
+public class MmFeignFactoryBean implements FactoryBean<Object>, InitializingBean, ApplicationContextAware {
     /**
      * spring context
      */
@@ -114,39 +114,42 @@ public class MmFeignFactoryBean implements FactoryBean<Object>, InitializingBean
     public void afterPropertiesSet() throws Exception {
         Assert.hasText(url, "远程调用接口必须设置url地址");
         Assert.notNull(type, "type must not be null");
-        decoder = applicationContext.getBean(Decoder.class);
-        encoder = applicationContext.getBean(Encoder.class);
-        errorDecoder = applicationContext.getBean(ErrorDecoder.class);
-        HttpClient httpClient = null;
-        OkHttpClient okHttpClient=null;
-        try {
-            httpClient=applicationContext.getBean(HttpClient.class);
-        }catch (BeansException e){
-            try {
-                okHttpClient = applicationContext.getBean(OkHttpClient.class);
-            }catch (BeansException e1){
-                //ignore
-            }
-        }
-        if (Objects.isNull(httpClient)&&Objects.isNull(okHttpClient)){
-            throw new IllegalStateException("can not found any client");
-        }
-        else if (null != okHttpClient) {
-            client = new feign.okhttp.OkHttpClient(okHttpClient);
-        } else if (null != httpClient) {
-            client = new ApacheHttpClient(httpClient);
-        }
+        this.decoder = applicationContext.getBean(Decoder.class);
+        this.encoder = applicationContext.getBean(Encoder.class);
+        this.errorDecoder = applicationContext.getBean(ErrorDecoder.class);
+        this.client = realClient();
 
         this.contract = applicationContext.getBean(Contract.class);
-        feignLogFactory = new DefaultLogFactory(logger);
-        logger = feignLogFactory.create(type);
-        if (null == logLevel) {
-            logLevel = Logger.Level.BASIC;
+        this.feignLogFactory = new DefaultLogFactory(logger);
+        this.logger = this.feignLogFactory.create(type);
+        if (null == this.logLevel) {
+            this.logLevel = Logger.Level.BASIC;
         }
         //添加拦截器
         Map<String, RequestInterceptor> beans = applicationContext.getBeansOfType(RequestInterceptor.class);
         for (RequestInterceptor interceptor : beans.values()) {
             addInterceptor(interceptor);
+        }
+    }
+
+    private Client realClient() {
+        HttpClient httpClient = null;
+        OkHttpClient okHttpClient = null;
+        try {
+            httpClient = applicationContext.getBean(HttpClient.class);
+        } catch (BeansException e) {
+            try {
+                okHttpClient = applicationContext.getBean(OkHttpClient.class);
+            } catch (BeansException e1) {
+                //ignore
+            }
+        }
+        if (Objects.isNull(httpClient) && Objects.isNull(okHttpClient)) {
+            throw new IllegalStateException("can not found any client");
+        } else if (null != okHttpClient) {
+            return new feign.okhttp.OkHttpClient(okHttpClient);
+        } else {
+            return new ApacheHttpClient(httpClient);
         }
     }
 
