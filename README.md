@@ -55,8 +55,11 @@
 
 - 
 ### 1.1.0 
+- 主要用于http rest远程调用，其他未测试
+- 必须存在客户端
 - 提供默认配置
 - 引入spring4 注解支持
+- 使用jackjson（与spring兼容，建设依赖）
 
 ```java
 import io.github.rpc.configuration.ClientDefaultConfiguration;
