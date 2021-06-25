@@ -1,5 +1,5 @@
 ### 介绍
-- 简化传统SSM框架之间的HTTP+JSON调用
+- 简化传统SSM框架之间的HTTP+JSON调用(spring 4.0.8)
 
 - 借鉴cloud-openFeign
 
@@ -63,9 +63,9 @@
 
 ```java
 import io.github.rpc.configuration.ClientDefaultConfiguration;
-import org.springframework.context.annotation.Import;
+import io.github.rpc.configuration.HttpClientConfiguration;import org.springframework.context.annotation.Import;
 @Configuration
-@Import(ClientDefaultConfiguration.class)
+@Import({ClientDefaultConfiguration.class,HttpClientConfiguration.class})
 @EnableMmRpc(basePackages = "com.pjs.rpc")
   public class FeiConfiguration {
      
@@ -78,7 +78,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
-@MmRpcService("http://localhost:9527")
+@MmRpcService(url="http://localhost:9527",path = "")
 public interface TestFeign{
     @RequestMapping(value = "/test",method = RequestMethod.GET)
     @ResponseBody
