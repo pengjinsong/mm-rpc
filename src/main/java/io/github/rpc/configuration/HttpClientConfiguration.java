@@ -100,6 +100,7 @@ public class HttpClientConfiguration {
 
     @PreDestroy
     public void destroy() throws IOException {
+        connectTimer.cancel();
         if (httpClient != null) {
             httpClient.close();
         }
