@@ -16,6 +16,17 @@
         <apache.httpclient.version>4.5.13</apache.httpclient.version>
     </properties>
 
+    <developers>
+        <developer>
+            <name>pengjinsong</name>
+            <email>pengjinsongk@163.com</email>
+        </developer>
+    </developers>
+
+    <scm>
+        <url>scm:git:https://github.com/pengjinsong/mm-rpc.git</url>
+    </scm>
+
     <dependencies>
         <!-- feign dependencies -->
         <dependency>
